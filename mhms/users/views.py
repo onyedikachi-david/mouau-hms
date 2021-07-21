@@ -85,10 +85,6 @@ def hostel_application(request):
 
 
 def admin_dashboard_view(request):
-    # for both table in admin dashboard
-    # students = Student.objects.all().order_by('-id')
-    # rooms = Room.objects.all().order_by('-id')
-    # for three cards
     student_count = Student.objects.all().count()
     staff_count = Portal.objects.all().count()
     total_rooms = Room.objects.all().count()
