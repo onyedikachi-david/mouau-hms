@@ -43,3 +43,12 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+
+def student_register(request):
+    pass
+
+def student_login(request):
+    pass
+
+def hostel_application(request):
+    pass
