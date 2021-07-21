@@ -94,7 +94,7 @@ class Admin(User):
         **kwargs,
     ):
         if not self.pk:
-            self.type = User.Types.DOCTOR
+            self.type = User.Types.ADMIN
         return super().save(*args, **kwargs)
 
 
@@ -114,14 +114,14 @@ class PortalAttributes(Model):
 
     @property
     def get_name(self):
-        return self.user.first_name + " " + self.user.last_name
+        return f"{self.user.first_name} {self.user.last_name}"
 
     @property
     def get_id(self):
         return self.user.id
 
     def __str__(self):
-        return f"{self.get_name()}"
+        return f"{self.user.name}"
 
 
 class Portal(User):
@@ -140,7 +140,7 @@ class Portal(User):
         **kwargs,
     ):
         if not self.pk:
-            self.type = User.Types.DOCTOR
+            self.type = User.Types.PORTAL
         return super().save(*args, **kwargs)
 
 
@@ -152,29 +152,32 @@ class Portal(User):
 
 class Room(models.Model):
     room_num = models.IntegerField(_("Room number"))
-    occupied = models.BooleanField(_("Is the room occupied?"))
-    ROOM_CONDITION = [
-        ('g', 'Good'),
-        ('b', 'Bad'),
-        ('m', 'Maintenance')
-    ]
+    occupied = models.BooleanField(_("Is the room occupied?"), default=False)
+
+    class RoomCondition(TextChoices):
+        GOOD = "GOOD", "Good"
+        BAD = "BAD", "Bad"
+        MAINTENANCE = "MAINTENANCE", "Maintenance"
     room_condition = models.CharField(
         _("Room condition"),
-        choices=ROOM_CONDITION,
-        max_length=50)
+        choices=RoomCondition.choices,
+        max_length=50, default=RoomCondition.GOOD)
     occupants = models.ForeignKey(
         "PortalAttributes",
         verbose_name=_("Room occupants"),
         on_delete=models.CASCADE)
-    ROOM_STATUS = [
-        ('f', 'Full'),
-        ('e', 'Empty'),
-    ]
+
+    class RoomStatus(TextChoices):
+        FULL = "FULL", "Full"
+        EMPTY = "EMPTY", "Empty"
     room_status = models.CharField(
         _("Is the room full or empty"),
-        max_length=50, choices=ROOM_STATUS)
+        max_length=50, choices=RoomStatus.choices, default=RoomStatus.EMPTY)
     total_bed_space = models.IntegerField(
         _("Total bed spaces"), default=8)
+
+    def __str__(self):
+        return f"{self.room_num}"
 
 
 class Hostel(models.Model):
@@ -196,11 +199,10 @@ class Hostel(models.Model):
         _("Male or Female"),
         max_length=1,
         choices=GENDER_CHOICES)
-    room = models.ForeignKey(
-        Room,
-        verbose_name=_("Rooms"),
-        on_delete=models.CASCADE)
+    room_spaces = models.PositiveSmallIntegerField(default=20)
 
+    def __str__(self):
+        return f"{self.name}"
 
 ########### End of Hostel and Room model ----------------###################################
 
@@ -210,13 +212,22 @@ class Hostel(models.Model):
 class Level(models.Model):
     name = models.CharField(verbose_name="Student Level", max_length=5)
 
+    def __str__(self):
+        return self.name
+
 
 class College(models.Model):
-    name = models.CharField(verbose_name="Student College", max_length=5)
+    name = models.CharField(verbose_name="Student College", max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
 class Department(models.Model):
-    name = models.CharField(verbose_name="Student Department", max_length=5)
+    name = models.CharField(verbose_name="Student Department", max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class StudentAttributes(Model):
@@ -226,10 +237,10 @@ class StudentAttributes(Model):
     college = OneToOneField(College, on_delete=models.CASCADE, related_name="student_college")
     department = OneToOneField(Department, on_delete=models.CASCADE, related_name="student_department")
     hostel_allocated = OneToOneField("Hostel", on_delete=models.CASCADE, related_name="hostel_allocated")
-    room = OneToOneField("Room", on_delete=models.CASCADE, related_name="room_allocated")
+    room = OneToOneField("Room", on_delete=models.CASCADE, related_name="room_allocated", null=True)
     # status = models.CharField(verbose_name="Is the student verified or not", choices=)
-    payment_status = models.BooleanField(verbose_name="Student payment status")
-    payment_date = models.DateTimeField(auto_now_add=False)
+    payment_status = models.BooleanField(verbose_name="Student payment status", null=True)
+    payment_date = models.DateTimeField(auto_now_add=False, null=True)
     profile_pic = models.ImageField(
         upload_to="profile_pic/DoctorProfilePic/", null=True, blank=True
     )
@@ -239,7 +250,7 @@ class StudentAttributes(Model):
 
     @property
     def get_name(self):
-        return self.user.first_name + " " + self.user.last_name
+        return f"{self.user.first_name} {self.user.last_name}"
 
     @property
     def get_id(self):
@@ -265,7 +276,18 @@ class Student(User):
         **kwargs,
     ):
         if not self.pk:
-            self.type = User.Types.DOCTOR
+            self.type = User.Types.STUDENT
         return super().save(*args, **kwargs)
 
-########### End of Student proxy model and Attributes ----------------#######################
+
+###########____________________ End of Student proxy model and Attributes ----------------#######################
+
+
+###########_____________________ Hostel application model ----------------#######################
+
+class HostelApplicationModel(models.Model):
+    student = OneToOneField("Student", on_delete=models.CASCADE)
+    hostel = OneToOneField("Hostel", on_delete=models.CASCADE)
+    room = OneToOneField("Room", on_delete=models.CASCADE)
+
+###########_____________________End of Hostel application model ----------------#######################

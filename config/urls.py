@@ -6,15 +6,20 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
+from mhms.users.views import student_register, hostel_application, admin_dashboard_view
+
 urlpatterns = [
     path("",
          TemplateView.as_view(template_name="hostel/index.html"), name="home"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
+    path("student-register", student_register, name="student-registration"),
+    path("apply", hostel_application, name="apply"),
+    path("admin-dashboard", admin_dashboard_view, name="admin-dashboard"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
-    # Custoom admin template
+    # Custom admin template
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     # User management

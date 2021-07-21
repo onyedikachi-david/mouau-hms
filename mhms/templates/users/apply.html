@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ user.username }}{% endblock %}
+
+{% block content %}
+{#  <h1>{{ user.username }}</h1>#}
+  <br>
+  <form class="form-horizontal" method="post">
+    {% csrf_token %}
+          <div class="form-group">
+    {% render_field hostel_application_form.hostel class="form-control" placeholder="Choose a hostel" %}
+          </div>
+    <div class="form-group">
+              {% render_field hostel_application_form.room class="form-control" placeholder="Choose a Room" %}
+                  </div>
+      <div class="form-group">
+        {% render_field student_user_form.name class="form-control" placeholder="Full Name" %}
+      </div>
+     <div class="form-group">
+              {% render_field student_user_form.password class="form-control" placeholder="Password" %}
+              </div>
+    <div class="form-group">
+              {% render_field student_reg_form.reg_num class="form-control" placeholder="Password" %}
+              </div>
+      <div class="form-group">
+              {% render_field student_reg_form.level class="form-control" placeholder="Level" %}
+              </div>
+    <div class="form-group">
+              {% render_field student_reg_form.college class="form-control" placeholder="College" %}
+              </div>
+    <div class="form-group">
+              {% render_field student_reg_form.department class="form-control" placeholder="Department" %}
+              </div>
+      <div class="form-group">
+              {% render_field student_reg_form.address class="form-control" placeholder="Address" %}
+              </div>
+      <div class="form-group">
+              {% render_field student_reg_form.mobile class="form-control" placeholder="Mobile" %}
+              </div>
+    <div class="form-group">
+              {% render_field student_reg_form.profile_pic class="form-control" placeholder="Profile Picture" %}
+              </div>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

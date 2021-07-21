@@ -69,6 +69,7 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
+    'widget_tweaks',
     "crispy_forms",
     "allauth",
     "allauth.account",
